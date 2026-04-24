@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Compras — Maio 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f3ee;
+    --card: #ffffff;
+    --green: #2d6a4f;
+    --green-light: #e8f5ef;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --blue: #1a4d7c;
+    --blue-light: #e8f0f8;
+    --yellow: #b07d2a;
+    --yellow-light: #fdf3e0;
+    --purple: #5c3d8f;
+    --purple-light: #f0ebf8;
+    --orange: #b05a1a;
+    --orange-light: #fdeede;
+    --teal: #1a6b6b;
+    --teal-light: #e0f5f5;
+    --text: #1a1a1a;
+    --muted: #888;
+    --border: #e5e0d8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 16px 60px;
+  }
+
+  /* ── HEADER ── */
+  header { text-align: center; margin-bottom: 28px; }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--green);
+    line-height: 1.1;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 6px;
+    font-weight: 300;
+  }
+
+  /* ── CONFIG BOX ── */
+  .config-box {
+    max-width: 640px;
+    margin: 0 auto 24px;
+    background: var(--green-light);
+    border: 1px solid #b7dfc8;
+    border-radius: 14px;
+    padding: 16px 20px;
+  }
+
+  .config-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .config-box p {
+    font-size: 0.78rem;
+    color: #4a7a62;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .config-box p code {
+    background: rgba(45,106,79,0.12);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.75rem;
+  }
+
+  .url-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .url-input {
+    flex: 1;
+    background: white;
+    border: 1px solid #b7dfc8;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--text);
+    outline: none;
+  }
+
+  .url-input:focus { border-color: var(--green); }
+  .url-input::placeholder { color: var(--muted); }
+
+  .btn-connect {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .btn-connect:hover { opacity: 0.85; }
+
+  .config-box.connected {
+    background: var(--green-light);
+    border-color: var(--green);
+  }
+
+  .connected-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  /* ── BUDGET BAR ── */
+  .budget-bar {
+    max-width: 640px;
+    margin: 0 auto 28px;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px 24px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .budget-item { text-align: center; }
+
+  .budget-item .label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .budget-item .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-top: 2px;
+  }
+
+  .budget-item .value.warn { color: var(--yellow); }
+  .budget-item .value.paid { color: var(--green); }
+
+  .progress-wrap {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #52b788);
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  /* ── FILTROS ── */
+  .filters-wrap {
+    max-width: 640px;
+    margin: 0 auto 20px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .filters-wrap::-webkit-scrollbar { display: none; }
+
+  .filter-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .filter-pill:hover { border-color: var(--green); color: var(--green); }
+  .filter-pill.active { background: var(--green-light); border-color: var(--green); color: var(--green); font-weight: 500; }
+
+  /* ── ADD TOGGLE ── */
+  .add-wrap { max-width: 640px; margin: 0 auto 20px; }
+
+  .add-toggle {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px dashed #b7dfc8;
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--green);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+
+  .add-toggle:hover { background: var(--green-light); }
+
+  /* ── ADD FORM ── */
+  .add-form {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 8px;
+    animation: slideDown 0.18s ease;
+  }
+
+  .add-form.open { display: block; }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--green); }
+
+  .form-group textarea { resize: vertical; min-height: 64px; }
+
+  .qty-row { display: flex; gap: 8px; }
+  .qty-row input:first-child { flex: 1; }
+  .qty-row input:last-child { width: 72px; }
+
+  .form-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary { background: var(--green); color: white; }
+  .btn-primary:hover { background: #245c43; }
+  .btn-ghost { background: transparent; color: var(--muted); }
+  .btn-ghost:hover { color: var(--text); }
+
+  /* ── SECTION ── */
+  .section {
+    max-width: 640px;
+    margin: 0 auto 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .section-count {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .section-est {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* ── ITEMS GRID ── */
+  .items-grid {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    transition: background 0.12s;
+  }
+
+  .item-row:last-child { border-bottom: none; }
+  .item-row:hover { background: #faf8f5; }
+  .item-row.checked { opacity: 0.42; }
+  .item-row.checked .item-name { text-decoration: line-through; color: var(--muted); }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+  }
+
+  .item-row.checked .checkbox { background: var(--green); border-color: var(--green); }
+  .checkbox svg { display: none; width: 12px; height: 12px; }
+  .item-row.checked .checkbox svg { display: block; }
+
+  .item-body { flex: 1; min-width: 0; }
+
+  .item-name {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+  }
+
+  .item-qty {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .price-tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  .price-tag.est { background: var(--yellow-light); color: var(--yellow); }
+  .price-tag.paid { background: var(--green-light); color: var(--green); }
+
+  .notes-tag {
+    font-size: 0.73rem;
+    color: var(--muted);
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+
+  .item-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.12s;
+    flex-shrink: 0;
+  }
+
+  .item-row:hover .item-actions { opacity: 1; }
+
+  .act-btn {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    font-size: 0.78rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+  }
+
+  .act-btn:hover { border-color: var(--green); color: var(--green); }
+  .act-btn.del:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+
+  /* ── EDIT FORM ── */
+  .edit-form {
+    display: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 14px 16px;
+    animation: slideDown 0.15s ease;
+  }
+
+  .edit-form.open { display: block; }
+
+  /* ── SECTION COLORS ── */
+  .s-acougue .section-icon { background: var(--red-light); }
+  .s-acougue .section-title { color: var(--red); }
+  .s-graos .section-icon { background: var(--yellow-light); }
+  .s-graos .section-title { color: var(--yellow); }
+  .s-temperos .section-icon { background: var(--green-light); }
+  .s-temperos .section-title { color: var(--green); }
+  .s-laticinios .section-icon { background: var(--blue-light); }
+  .s-laticinios .section-title { color: var(--blue); }
+  .s-cafe .section-icon { background: var(--yellow-light); }
+  .s-cafe .section-title { color: var(--yellow); }
+  .s-horti .section-icon { background: var(--green-light); }
+  .s-horti .section-title { color: var(--green); }
+  .s-limpeza .section-icon { background: var(--teal-light); }
+  .s-limpeza .section-title { color: var(--teal); }
+  .s-farmacia .section-icon { background: var(--purple-light); }
+  .s-farmacia .section-title { color: var(--purple); }
+  .s-bebidas .section-icon { background: var(--blue-light); }
+  .s-bebidas .section-title { color: var(--blue); }
+  .s-congelados .section-icon { background: #e8f0f8; }
+  .s-congelados .section-title { color: #1a5a8a; }
+  .s-outros .section-icon { background: #f0f0f0; }
+  .s-outros .section-title { color: #666; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: white;
+    border-radius: 99px;
+    padding: 9px 20px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 300;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── LOADING ── */
+  .loading {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── EMPTY ── */
+  .empty-state {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px 20px;
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+
+  .empty-state .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+
+  .empty-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .empty-state p { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+
+  .btn-seed {
+    display: inline-block;
+    margin-top: 14px;
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid #b7dfc8;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-seed:hover { background: #d0eddd; }
+
+  /* ── FOOTER NOTE ── */
+  .footer-note {
+    max-width: 640px;
+    margin: 28px auto 0;
+    background: var(--green-light);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 0.82rem;
+    color: var(--green);
+    line-height: 1.5;
+    border: 1px solid #b7dfc8;
+  }
+
+  @media (max-width: 480px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .item-actions { opacity: 1; }
+    header h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛒 Lista de Compras</h1>
+  <p id="headerSub">Felipe & Ane · Maio 2026 · 2 pessoas · 30 dias</p>
+</header>
+
+<!-- CONFIG -->
+<div id="configWrap">
+  <div class="config-box" id="configBox">
+    <h3>🔗 Conectar à Planilha Google</h3>
+    <p>Cole a URL do seu Apps Script Web App (termina com <code>/exec</code>) para salvar e carregar itens da planilha.</p>
+    <div class="url-row">
+      <input type="url" class="url-input" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec" />
+      <button class="btn-connect" onclick="conectar()">Conectar</button>
+    </div>
+    <div class="connected-label" id="connectedLabel" style="display:none">✅ Conectado à planilha · <span style="text-decoration:underline;cursor:pointer;font-size:0.75rem;opacity:0.7" onclick="desconectar()">trocar</span></div>
+  </div>
+</div>
+
+<!-- BUDGET BAR -->
+<div class="budget-bar" id="budgetBar">
+  <div class="budget-item">
+    <div class="label">Orçamento</div>
+    <div class="value">R$ 1.600</div>
+  </div>
+  <div class="budget-item">
+    <div class="label">Estimativa total</div>
+    <div class="value warn" id="statEst">R$ 0,00</div>
+  </div>
+  <div class="budget-item">
+    <div class="label">Total pago</div>
+    <div class="value paid" id="statPaid">R$ 0,00</div>
+  </div>
+  <div class="budget-item">
+    <div class="label">Comprados</div>
+    <div class="value" id="statDone">0 / 0</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-text" id="progressText">0% concluído</div>
+</div>
+
+<!-- FILTROS -->
+<div class="filters-wrap" id="filtersWrap">
+  <button class="filter-pill active" onclick="setFilter('todos',this)">Todos</button>
+  <button class="filter-pill" onclick="setFilter('pendentes',this)">Pendentes</button>
+  <button class="filter-pill" onclick="setFilter('comprados',this)">✓ Comprados</button>
+</div>
+
+<!-- ADD -->
+<div class="add-wrap">
+  <button class="add-toggle" id="addToggle" onclick="toggleAdd()">
+    <span style="font-size:1.2rem;line-height:1">＋</span> Adicionar item à lista
+  </button>
+  <div class="add-form" id="addForm">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nome do item *</label>
+        <input type="text" id="f_item" placeholder="Ex: Arroz tipo 1" />
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="f_cat">
+          <option value="Açougue">🥩 Açougue</option>
+          <option value="Grãos e Secos" selected>🌾 Grãos e Secos</option>
+          <option value="Temperos e Óleos">🫒 Temperos e Óleos</option>
+          <option value="Laticínios e Frios">🧀 Laticínios e Frios</option>
+          <option value="Café da Manhã">☕ Café da Manhã</option>
+          <option value="Hortifrúti">🥦 Hortifrúti</option>
+          <option value="Limpeza">🧹 Limpeza</option>
+          <option value="Farmácia">💊 Farmácia</option>
+          <option value="Bebidas">🥤 Bebidas</option>
+          <option value="Congelados">🧊 Congelados</option>
+          <option value="Outros">📦 Outros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantidade + Unidade</label>
+        <div class="qty-row">
+          <input type="number" id="f_qty" placeholder="1" min="0" step="0.5" />
+          <input type="text" id="f_unit" placeholder="kg / un / L" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Valor estimado (R$)</label>
+        <input type="number" id="f_est" placeholder="0,00" min="0" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label>Valor pago (R$)</label>
+        <input type="number" id="f_pago" placeholder="0,00" min="0" step="0.01" />
+      </div>
+      <div class="form-group full">
+        <label>Notas / Observações</label>
+        <textarea id="f_notas" placeholder="Marca preferida, onde comprar..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="toggleAdd()">Cancelar</button>
+      <button class="btn btn-primary" onclick="addItem()">Adicionar item</button>
+    </div>
+  </div>
+</div>
+
+<!-- LISTA -->
+<div id="listContainer">
+  <div class="loading">
+    <div class="spinner"></div><br>
+    Aguardando conexão com a planilha...
+  </div>
+</div>
+
+<!-- FOOTER NOTE -->
+<div class="footer-note">
+  💡 <strong>Dica:</strong> Hortifrúti compre em 2 vezes no mês para garantir frescor. Carnes podem ser congeladas já na primeira semana. Lembre de verificar os rótulos de geléias e produtos prontos — alguns levam mel na fórmula.
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DADOS ─────────────────────────────────────────────────────
+const STORAGE_KEY = 'lista_compras_url';
+let API_URL = localStorage.getItem(STORAGE_KEY) || '';
+let allItems = [];
+let currentFilter = 'todos';
+
+const CAT_CONFIG = {
+  'Açougue':           { emoji:'🥩', cls:'s-acougue'   },
+  'Grãos e Secos':     { emoji:'🌾', cls:'s-graos'     },
+  'Temperos e Óleos':  { emoji:'🫒', cls:'s-temperos'  },
+  'Laticínios e Frios':{ emoji:'🧀', cls:'s-laticinios'},
+  'Café da Manhã':     { emoji:'☕', cls:'s-cafe'      },
+  'Hortifrúti':        { emoji:'🥦', cls:'s-horti'     },
+  'Limpeza':           { emoji:'🧹', cls:'s-limpeza'   },
+  'Farmácia':          { emoji:'💊', cls:'s-farmacia'  },
+  'Bebidas':           { emoji:'🥤', cls:'s-bebidas'   },
+  'Congelados':        { emoji:'🧊', cls:'s-congelados'},
+  'Outros':            { emoji:'📦', cls:'s-outros'    },
+};
+
+const LISTA_INICIAL = [
+  {item:"Peito de frango",categoria:"Açougue",quantidade:3,unidade:"kg",precoEstimado:45},
+  {item:"Coxa e sobrecoxa",categoria:"Açougue",quantidade:2,unidade:"kg",precoEstimado:22},
+  {item:"Carne moída",categoria:"Açougue",quantidade:2,unidade:"kg",precoEstimado:36},
+  {item:"Acém ou patinho",categoria:"Açougue",quantidade:1.5,unidade:"kg",precoEstimado:28},
+  {item:"Linguiça calabresa",categoria:"Açougue",quantidade:500,unidade:"g",precoEstimado:12},
+  {item:"Bacon em cubos",categoria:"Açougue",quantidade:300,unidade:"g",precoEstimado:10},
+  {item:"Ovos",categoria:"Açougue",quantidade:2,unidade:"bandeja 30un",precoEstimado:30},
+  {item:"Arroz tipo 1",categoria:"Grãos e Secos",quantidade:5,unidade:"kg",precoEstimado:22},
+  {item:"Feijão carioca",categoria:"Grãos e Secos",quantidade:2,unidade:"kg",precoEstimado:14},
+  {item:"Feijão preto",categoria:"Grãos e Secos",quantidade:1,unidade:"kg",precoEstimado:8},
+  {item:"Macarrão espaguete",categoria:"Grãos e Secos",quantidade:3,unidade:"pct 500g",precoEstimado:12},
+  {item:"Macarrão parafuso",categoria:"Grãos e Secos",quantidade:2,unidade:"pct 500g",precoEstimado:8},
+  {item:"Farinha de trigo",categoria:"Grãos e Secos",quantidade:1,unidade:"kg",precoEstimado:6},
+  {item:"Aveia em flocos",categoria:"Grãos e Secos",quantidade:500,unidade:"g",precoEstimado:7},
+  {item:"Lentilha",categoria:"Grãos e Secos",quantidade:500,unidade:"g",precoEstimado:7},
+  {item:"Azeite extra virgem",categoria:"Temperos e Óleos",quantidade:500,unidade:"ml",precoEstimado:22},
+  {item:"Óleo de soja",categoria:"Temperos e Óleos",quantidade:900,unidade:"ml",precoEstimado:8},
+  {item:"Sal refinado",categoria:"Temperos e Óleos",quantidade:1,unidade:"kg",precoEstimado:4},
+  {item:"Alho",categoria:"Temperos e Óleos",quantidade:6,unidade:"cabeças",precoEstimado:9},
+  {item:"Cebola",categoria:"Temperos e Óleos",quantidade:2,unidade:"kg",precoEstimado:8},
+  {item:"Extrato de tomate",categoria:"Temperos e Óleos",quantidade:3,unidade:"latas 140g",precoEstimado:9},
+  {item:"Molho de tomate",categoria:"Temperos e Óleos",quantidade:4,unidade:"cx 520g",precoEstimado:16},
+  {item:"Caldo de galinha",categoria:"Temperos e Óleos",quantidade:2,unidade:"cx sachê",precoEstimado:8},
+  {item:"Pimenta-do-reino",categoria:"Temperos e Óleos",quantidade:1,unidade:"pote",precoEstimado:5},
+  {item:"Colorau / Páprica",categoria:"Temperos e Óleos",quantidade:1,unidade:"pote",precoEstimado:5},
+  {item:"Orégano",categoria:"Temperos e Óleos",quantidade:1,unidade:"pote",precoEstimado:4},
+  {item:"Vinagre",categoria:"Temperos e Óleos",quantidade:750,unidade:"ml",precoEstimado:5},
+  {item:"Leite integral longa vida",categoria:"Laticínios e Frios",quantidade:12,unidade:"cx 1L",precoEstimado:60},
+  {item:"Manteiga com sal",categoria:"Laticínios e Frios",quantidade:2,unidade:"potes 200g",precoEstimado:18},
+  {item:"Queijo mussarela",categoria:"Laticínios e Frios",quantidade:400,unidade:"g",precoEstimado:16},
+  {item:"Requeijão",categoria:"Laticínios e Frios",quantidade:2,unidade:"potes 250g",precoEstimado:16},
+  {item:"Iogurte natural",categoria:"Laticínios e Frios",quantidade:4,unidade:"potes 170g",precoEstimado:18},
+  {item:"Presunto fatiado",categoria:"Laticínios e Frios",quantidade:200,unidade:"g",precoEstimado:9},
+  {item:"Creme de leite",categoria:"Laticínios e Frios",quantidade:3,unidade:"cx 200g",precoEstimado:12},
+  {item:"Café em pó",categoria:"Café da Manhã",quantidade:2,unidade:"pct 500g",precoEstimado:30},
+  {item:"Açúcar",categoria:"Café da Manhã",quantidade:2,unidade:"kg",precoEstimado:10},
+  {item:"Pão de forma",categoria:"Café da Manhã",quantidade:4,unidade:"pct 500g",precoEstimado:28},
+  {item:"Granola",categoria:"Café da Manhã",quantidade:500,unidade:"g",precoEstimado:12},
+  {item:"Geleia (sem mel)",categoria:"Café da Manhã",quantidade:1,unidade:"pote 300g",precoEstimado:9,notas:"Verificar mel no rótulo"},
+  {item:"Biscoito salgado",categoria:"Café da Manhã",quantidade:3,unidade:"pacotes",precoEstimado:12},
+  {item:"Biscoito doce",categoria:"Café da Manhã",quantidade:2,unidade:"pacotes",precoEstimado:10},
+  {item:"Tomate",categoria:"Hortifrúti",quantidade:2,unidade:"kg",precoEstimado:12},
+  {item:"Batata inglesa",categoria:"Hortifrúti",quantidade:3,unidade:"kg",precoEstimado:12},
+  {item:"Cenoura",categoria:"Hortifrúti",quantidade:1,unidade:"kg",precoEstimado:5},
+  {item:"Alface",categoria:"Hortifrúti",quantidade:4,unidade:"pés",precoEstimado:10},
+  {item:"Limão",categoria:"Hortifrúti",quantidade:6,unidade:"unidades",precoEstimado:4},
+  {item:"Banana",categoria:"Hortifrúti",quantidade:2,unidade:"kg",precoEstimado:8},
+  {item:"Maçã",categoria:"Hortifrúti",quantidade:1,unidade:"kg",precoEstimado:8},
+  {item:"Laranja",categoria:"Hortifrúti",quantidade:2,unidade:"kg",precoEstimado:8},
+  {item:"Abobrinha",categoria:"Hortifrúti",quantidade:4,unidade:"unidades",precoEstimado:8},
+  {item:"Brócolis",categoria:"Hortifrúti",quantidade:2,unidade:"maços",precoEstimado:10},
+  {item:"Pepino",categoria:"Hortifrúti",quantidade:4,unidade:"unidades",precoEstimado:6},
+  {item:"Detergente",categoria:"Limpeza",quantidade:3,unidade:"un 500ml",precoEstimado:12},
+  {item:"Esponja de louça",categoria:"Limpeza",quantidade:6,unidade:"unidades",precoEstimado:10},
+  {item:"Sabão em pó",categoria:"Limpeza",quantidade:1.5,unidade:"kg",precoEstimado:18},
+  {item:"Amaciante",categoria:"Limpeza",quantidade:1,unidade:"L",precoEstimado:9},
+  {item:"Água sanitária",categoria:"Limpeza",quantidade:2,unidade:"L",precoEstimado:8},
+  {item:"Multiuso spray",categoria:"Limpeza",quantidade:2,unidade:"unidades",precoEstimado:14},
+  {item:"Saco de lixo P",categoria:"Limpeza",quantidade:1,unidade:"pct 30L",precoEstimado:6},
+  {item:"Saco de lixo G",categoria:"Limpeza",quantidade:1,unidade:"pct 100L",precoEstimado:8},
+  {item:"Papel higiênico",categoria:"Limpeza",quantidade:2,unidade:"fardos 16un",precoEstimado:28},
+  {item:"Papel toalha",categoria:"Limpeza",quantidade:4,unidade:"rolos",precoEstimado:10},
+  {item:"Dipirona 500mg",categoria:"Farmácia",quantidade:1,unidade:"caixa",precoEstimado:12},
+  {item:"Dipirona gotas",categoria:"Farmácia",quantidade:1,unidade:"frasco",precoEstimado:10},
+  {item:"Buscopan composto",categoria:"Farmácia",quantidade:1,unidade:"caixa",precoEstimado:18},
+  {item:"Loratadina 10mg",categoria:"Farmácia",quantidade:1,unidade:"caixa",precoEstimado:12},
+  {item:"Band-aid sortido",categoria:"Farmácia",quantidade:1,unidade:"caixa",precoEstimado:8},
+  {item:"Álcool gel 70%",categoria:"Farmácia",quantidade:500,unidade:"ml",precoEstimado:10},
+  {item:"Bepantol derma",categoria:"Farmácia",quantidade:1,unidade:"bisnaga",precoEstimado:22},
+  {item:"Termômetro digital",categoria:"Farmácia",quantidade:1,unidade:"unidade",precoEstimado:30},
+  {item:"Repelente",categoria:"Farmácia",quantidade:1,unidade:"unidade",precoEstimado:20},
+  {item:"Protetor solar FPS 50",categoria:"Farmácia",quantidade:2,unidade:"unidades",precoEstimado:45},
+];
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  if (API_URL) {
+    document.getElementById('urlInput').value = API_URL;
+    showConnected();
+    loadItems();
+  } else {
+    renderEmpty('configure');
+  }
+});
+
+function showConnected() {
+  document.getElementById('connectedLabel').style.display = 'flex';
+  document.getElementById('configBox').classList.add('connected');
+}
+
+function desconectar() {
+  API_URL = '';
+  localStorage.removeItem(STORAGE_KEY);
+  document.getElementById('urlInput').value = '';
+  document.getElementById('connectedLabel').style.display = 'none';
+  document.getElementById('configBox').classList.remove('connected');
+  allItems = [];
+  renderEmpty('configure');
+  updateStats();
+}
+
+function conectar() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url || !url.includes('script.google.com')) {
+    toast('⚠️ URL inválida — deve ser do Apps Script');
+    return;
+  }
+  API_URL = url;
+  localStorage.setItem(STORAGE_KEY, url);
+  showConnected();
+  toast('Conectado! Carregando itens...');
+  loadItems();
+}
+
+// ── API ───────────────────────────────────────────────────────
+async function apiGet(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(`${API_URL}?${qs}`);
+  return res.json();
+}
+
+async function apiPost(body) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  return res.json();
+}
+
+// ── LOAD ──────────────────────────────────────────────────────
+async function loadItems() {
+  if (!API_URL) return;
+  document.getElementById('listContainer').innerHTML =
+    '<div class="loading"><div class="spinner"></div><br>Carregando da planilha...</div>';
+  try {
+    const data = await apiGet({ action: 'getAll' });
+    if (data.success) {
+      allItems = data.items;
+      renderAll();
+    } else {
+      toast('Erro: ' + data.error);
+      renderEmpty('error');
+    }
+  } catch(e) {
+    toast('Erro de conexão — verifique a URL');
+    renderEmpty('error');
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderAll() {
+  updateStats();
+  updateCategoryFilters();
+
+  let items = [...allItems];
+  if (currentFilter === 'pendentes') items = items.filter(i => !i.comprado);
+  if (currentFilter === 'comprados') items = items.filter(i => i.comprado);
+  if (currentFilter.startsWith('cat:')) {
+    const cat = currentFilter.slice(4);
+    items = items.filter(i => i.categoria === cat);
+  }
+
+  if (items.length === 0) {
+    if (allItems.length === 0) {
+      renderEmpty('empty');
+    } else {
+      document.getElementById('listContainer').innerHTML =
+        '<div class="loading" style="color:var(--muted)">Nenhum item nesta categoria.</div>';
+    }
+    return;
+  }
+
+  // Agrupa por categoria
+  const groups = {};
+  items.forEach(item => {
+    const cat = item.categoria || 'Outros';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
+  });
+
+  const catOrder = Object.keys(CAT_CONFIG);
+  const sortedCats = Object.keys(groups).sort((a, b) => {
+    const ia = catOrder.indexOf(a), ib = catOrder.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+
+  let html = '';
+  sortedCats.forEach(cat => {
+    const cfg = CAT_CONFIG[cat] || { emoji:'📦', cls:'s-outros' };
+    const catItems = groups[cat];
+    const done = catItems.filter(i => i.comprado).length;
+    const totalEst = catItems.reduce((s,i) => s + (Number(i.precoEstimado)||0), 0);
+    const estLabel = totalEst ? `~R$ ${totalEst.toFixed(2)}` : '';
+
+    html += `
+      <div class="section ${cfg.cls}">
+        <div class="section-header">
+          <div class="section-icon">${cfg.emoji}</div>
+          <div class="section-title">${cat}</div>
+          <span class="section-count">${done}/${catItems.length}</span>
+          ${estLabel ? `<div class="section-est">${estLabel}</div>` : ''}
+        </div>
+        <div class="items-grid" id="grid_${slugify(cat)}">
+          ${catItems.map(item => renderRow(item)).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById('listContainer').innerHTML = html;
+}
+
+function renderRow(item) {
+  const checkedClass = item.comprado ? 'checked' : '';
+  const qtyStr = item.quantidade ? `${item.quantidade} ${item.unidade || ''}`.trim() : '';
+
+  let priceHtml = '';
+  if (item.pagoPor && Number(item.pagoPor) > 0) {
+    priceHtml = `<span class="price-tag paid">R$ ${Number(item.pagoPor).toFixed(2)} pago</span>`;
+  } else if (item.precoEstimado && Number(item.precoEstimado) > 0) {
+    priceHtml = `<span class="price-tag est">~R$ ${Number(item.precoEstimado).toFixed(2)}</span>`;
+  }
+
+  return `
+    <div class="item-row ${checkedClass}" id="row_${item.id}">
+      <div class="checkbox" onclick="toggleItem('${item.id}')">
+        <svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="item-body">
+        <div class="item-name">${item.item}</div>
+        <div class="item-sub">
+          ${qtyStr ? `<span class="item-qty">${qtyStr}</span>` : ''}
+          ${priceHtml}
+          ${item.notas ? `<span class="notes-tag">${item.notas}</span>` : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="act-btn" title="Editar" onclick="openEdit('${item.id}')">✎</button>
+        <button class="act-btn del" title="Remover" onclick="deleteItem('${item.id}')">✕</button>
+      </div>
+    </div>
+    <div class="edit-form" id="edit_${item.id}">
+      <div class="form-grid" style="margin-bottom:10px">
+        <div class="form-group full">
+          <label>Nome</label>
+          <input type="text" id="ei_item_${item.id}" value="${escHtml(item.item||'')}" />
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="ei_cat_${item.id}">
+            ${Object.keys(CAT_CONFIG).map(c =>
+              `<option value="${c}" ${c===item.categoria?'selected':''}>${CAT_CONFIG[c].emoji} ${c}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Quantidade + Unidade</label>
+          <div class="qty-row">
+            <input type="number" id="ei_qty_${item.id}" value="${item.quantidade||''}" />
+            <input type="text" id="ei_unit_${item.id}" value="${escHtml(item.unidade||'')}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Estimado (R$)</label>
+          <input type="number" id="ei_est_${item.id}" value="${item.precoEstimado||''}" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label>Pago (R$)</label>
+          <input type="number" id="ei_pago_${item.id}" value="${item.pagoPor||''}" step="0.01" />
+        </div>
+        <div class="form-group full">
+          <label>Notas</label>
+          <textarea id="ei_notas_${item.id}">${escHtml(item.notas||'')}</textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeEdit('${item.id}')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveEdit('${item.id}')">Salvar</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderEmpty(type) {
+  const msgs = {
+    configure: { emoji:'🔗', title:'Conecte sua planilha', text:'Cole a URL do Apps Script acima para salvar e carregar itens.' },
+    empty:     { emoji:'🛒', title:'Lista vazia', text:'Adicione itens manualmente ou importe a lista de maio que montamos.', seed: true },
+    error:     { emoji:'⚠️', title:'Erro de conexão', text:'Verifique se a URL está correta e o Apps Script está publicado como Web App.' },
+  };
+  const m = msgs[type] || msgs.empty;
+  document.getElementById('listContainer').innerHTML = `
+    <div class="empty-state">
+      <div class="emoji">${m.emoji}</div>
+      <h3>${m.title}</h3>
+      <p>${m.text}</p>
+      ${m.seed ? '<button class="btn-seed" onclick="seedData()">📋 Importar lista base de maio</button>' : ''}
+    </div>
+  `;
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+function updateStats() {
+  const total = allItems.length;
+  const done = allItems.filter(i => i.comprado).length;
+  const est = allItems.reduce((s,i) => s + (Number(i.precoEstimado)||0), 0);
+  const paid = allItems.reduce((s,i) => s + (Number(i.pagoPor)||0), 0);
+  const pct = total ? Math.round((done/total)*100) : 0;
+
+  document.getElementById('statEst').textContent = `R$ ${est.toFixed(2)}`;
+  document.getElementById('statPaid').textContent = `R$ ${paid.toFixed(2)}`;
+  document.getElementById('statDone').textContent = `${done} / ${total}`;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${pct}% concluído · ${total - done} itens restantes`;
+}
+
+// ── FILTROS ───────────────────────────────────────────────────
+function setFilter(filter, el) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = filter;
+  renderAll();
+}
+
+function updateCategoryFilters() {
+  const wrap = document.getElementById('filtersWrap');
+  const cats = [...new Set(allItems.map(i => i.categoria))].sort();
+  // Remove antigas
+  wrap.querySelectorAll('[data-cat]').forEach(el => el.remove());
+  cats.forEach(cat => {
+    const cfg = CAT_CONFIG[cat] || { emoji:'📦' };
+    const pill = document.createElement('button');
+    pill.className = 'filter-pill';
+    pill.setAttribute('data-cat', cat);
+    pill.textContent = cfg.emoji + ' ' + cat;
+    pill.onclick = function() { setFilter('cat:' + cat, this); };
+    wrap.appendChild(pill);
+  });
+}
+
+// ── ADD ───────────────────────────────────────────────────────
+function toggleAdd() {
+  document.getElementById('addForm').classList.toggle('open');
+  if (document.getElementById('addForm').classList.contains('open')) {
+    document.getElementById('f_item').focus();
+  }
+}
+
+async function addItem() {
+  const itemName = document.getElementById('f_item').value.trim();
+  if (!itemName) { toast('⚠️ Nome do item é obrigatório'); return; }
+  if (!API_URL) { toast('⚠️ Conecte a planilha primeiro'); return; }
+
+  const data = {
+    item: itemName,
+    categoria:    document.getElementById('f_cat').value,
+    quantidade:   document.getElementById('f_qty').value || 1,
+    unidade:      document.getElementById('f_unit').value || 'un',
+    precoEstimado: document.getElementById('f_est').value || null,
+    pagoPor:      document.getElementById('f_pago').value || null,
+    notas:        document.getElementById('f_notas').value,
+  };
+
+  try {
+    const res = await apiPost({ action: 'add', data });
+    if (res.success) {
+      toast('✅ ' + itemName + ' adicionado!');
+      ['f_item','f_qty','f_unit','f_est','f_pago','f_notas'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('addForm').classList.remove('open');
+      loadItems();
+    } else { toast('Erro: ' + res.error); }
+  } catch(e) { toast('Erro de conexão'); }
+}
+
+// ── TOGGLE ────────────────────────────────────────────────────
+async function toggleItem(id) {
+  if (!API_URL) return;
+  const row = document.getElementById('row_' + id);
+  if (row) row.classList.toggle('checked');
+  const item = allItems.find(i => i.id === id);
+  if (item) { item.comprado = !item.comprado; updateStats(); }
+  try {
+    await apiPost({ action: 'toggle', id });
+  } catch(e) { loadItems(); }
+}
+
+// ── EDIT ──────────────────────────────────────────────────────
+function openEdit(id) {
+  // Fecha outros
+  document.querySelectorAll('.edit-form.open').forEach(el => el.classList.remove('open'));
+  document.getElementById('edit_' + id).classList.add('open');
+}
+
+function closeEdit(id) {
+  document.getElementById('edit_' + id).classList.remove('open');
+}
+
+async function saveEdit(id) {
+  const data = {
+    item:          document.getElementById('ei_item_' + id).value,
+    categoria:     document.getElementById('ei_cat_' + id).value,
+    quantidade:    document.getElementById('ei_qty_' + id).value,
+    unidade:       document.getElementById('ei_unit_' + id).value,
+    precoEstimado: document.getElementById('ei_est_' + id).value || null,
+    pagoPor:       document.getElementById('ei_pago_' + id).value || null,
+    notas:         document.getElementById('ei_notas_' + id).value,
+  };
+  try {
+    const res = await apiPost({ action: 'update', id, data });
+    if (res.success) { toast('✅ Item atualizado!'); loadItems(); }
+    else { toast('Erro: ' + res.error); }
+  } catch(e) { toast('Erro de conexão'); }
+}
+
+// ── DELETE ────────────────────────────────────────────────────
+async function deleteItem(id) {
+  if (!confirm('Remover este item da lista?')) return;
+  try {
+    const res = await apiPost({ action: 'delete', id });
+    if (res.success) { toast('🗑 Item removido'); loadItems(); }
+  } catch(e) { toast('Erro de conexão'); }
+}
+
+// ── SEED ──────────────────────────────────────────────────────
+async function seedData() {
+  if (!API_URL) { toast('⚠️ Conecte a planilha primeiro'); return; }
+  document.getElementById('listContainer').innerHTML =
+    '<div class="loading"><div class="spinner"></div><br>Importando lista base...</div>';
+  try {
+    const res = await apiPost({ action: 'seed', items: LISTA_INICIAL });
+    if (res.success) { toast('✅ ' + res.message); loadItems(); }
+    else { toast('Erro: ' + res.error); }
+  } catch(e) { toast('Erro ao importar'); }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '_');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Enter no form de adicionar
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('addForm').classList.contains('open')) {
+    if (e.target.tagName !== 'TEXTAREA') addItem();
+  }
+});
+</script>
+</body>
+</html>
